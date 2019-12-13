@@ -9,7 +9,7 @@ function getChecklistPaths(): Record<string, string[]> {
   const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
   return parsedFile.paths;
 }
-
+// hehe
 async function run() {
   const issue: { owner: string; repo: string; number: number } =
     github.context.issue;
