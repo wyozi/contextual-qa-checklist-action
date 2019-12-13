@@ -10,6 +10,7 @@ function getChecklistPaths(): Record<string, string[]> {
   return parsedFile.paths;
 }
 
+// hm
 async function run() {
   const issue: { owner: string; repo: string; number: number } =
     github.context.issue;
