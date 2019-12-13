@@ -1,0 +1,13 @@
+name: "Contextual QA Checklists"
+description: "Submit a comment to PRs with a QA checklist based on context"
+inputs:
+  input-file:
+    description: "Path to file containing checklist definitions"
+    required: true
+    default: "CHECKLIST.yml"
+  gh-token:
+    description: "GH Token"
+    required: true
+runs:
+  using: "node12"
+  main: "dist/index.js"
