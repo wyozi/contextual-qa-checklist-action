@@ -1,0 +1,21 @@
+{
+  "name": "contextual-qa-checklist-action",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "url": "git@github.com:wyozi/contextual-qa-checklist-action.git",
+    "type": "git"
+  },
+  "author": "wyozi <joonasmertanen@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build-dist": "ncc build index.ts"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.0",
+    "@actions/github": "^2.0.0",
+    "@zeit/ncc": "^0.20.5",
+    "minimatch": "^3.0.4",
+    "yaml": "^1.7.2"
+  }
+}
