@@ -1,6 +1,5 @@
 paths:
   "*.ts":
     - Does code have tests?
-    - Are possibly unused imports removed?
   "CHECKLIST.yml":
     - Are items grammatically correct?
