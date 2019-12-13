@@ -49,3 +49,5 @@ jobs:
 #### Result
 
 When matching files are updated in a PR, the action will automatically post a checklist containing items under that path's key.
+
+See https://github.com/wyozi/contextual-qa-checklist-action/pull/10#issuecomment-565644854 for an example PR checklist
