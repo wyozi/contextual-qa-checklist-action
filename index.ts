@@ -20,6 +20,7 @@ async function run() {
 
   const issue: { owner: string; repo: string; number: number } =
     github.context.issue;
+  console.log(JSON.stringify(issue));
 
   const ghToken = core.getInput("gh-token");
   const client = new github.GitHub(ghToken);
