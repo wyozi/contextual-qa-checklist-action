@@ -9,6 +9,7 @@ const header =
 const footer =
   "This is an automatically generated QA checklist based on modified files";
 
+// test
 function getChecklistPaths(): Record<string, string[]> {
   const inputFile = core.getInput("input-file");
   const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
