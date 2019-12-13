@@ -4,6 +4,8 @@ const YAML = require("yaml");
 const minimatch = require("minimatch");
 const { readFileSync } = require("fs");
 
+// hey
+
 function getChecklistPaths(): Record<string, string[]> {
   const inputFile = core.getInput("input-file");
   const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
