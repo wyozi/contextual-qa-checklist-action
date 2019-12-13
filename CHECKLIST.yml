@@ -1,5 +1,3 @@
 paths:
-  "*.ts":
-    - Does code have tests?
-  "CHECKLIST.yml":
-    - Are items grammatically correct?
+  "README.md":
+    - Heyo
