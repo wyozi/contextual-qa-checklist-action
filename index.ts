@@ -4,6 +4,8 @@ const YAML = require("yaml");
 const minimatch = require("minimatch");
 const { readFileSync } = require("fs");
 
+// a change
+
 const header =
   "Great PR! Please pay attention to the following items before merging:";
 const footer =
