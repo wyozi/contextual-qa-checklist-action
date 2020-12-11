@@ -31,7 +31,7 @@ Only one property, `paths`, is supported at the moment. It takes path specificat
 `.github/workflows/checklist.yml`
 
 ```yml
-on: [pull_request]
+on: [pull_request_target]
 
 jobs:
   checklist_job:
