@@ -12,7 +12,7 @@
     "build-dist": "ncc build index.ts"
   },
   "dependencies": {
-    "@actions/core": "^1.2.0",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^2.0.0",
     "@zeit/ncc": "^0.20.5",
     "minimatch": "^3.0.4",
