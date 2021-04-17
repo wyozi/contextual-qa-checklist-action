@@ -4,15 +4,29 @@ const YAML = require("yaml");
 const minimatch = require("minimatch");
 const { readFileSync } = require("fs");
 
-const header =
-  "Great PR! Please pay attention to the following items before merging:";
-const footer =
-  "This is an automatically generated QA checklist based on modified files";
+const header = core.getInput("comment-header");
+const footer = core.getInput("comment-footer")
+
+const minimatchOptions = {
+  dot: core.getInput('include-hidden-files') === 'true'
+};
 
 function getChecklistPaths(): Record<string, string[]> {
   const inputFile = core.getInput("input-file");
   const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
   return parsedFile.paths;
+}
+
+function formatItemsForPath([path, items]): string {
+  const showPaths = core.getInput("show-paths") === 'true';
+
+  return showPaths
+  ? [
+      `__Files matching \`${path}\`:__\n`,
+      ...items.map((item) => `- [ ] ${item}\n`),
+      "\n",
+    ].join("")
+  : [...items.map((item) => `- [ ] ${item}\n`)].join("");
 }
 
 async function run() {
@@ -34,7 +48,7 @@ async function run() {
   const applicableChecklistPaths = Object.entries(checklistPaths).filter(
     ([key, _]) => {
       for (const modifiedPath of modifiedPaths) {
-        if (minimatch(modifiedPath, key)) {
+        if (minimatch(modifiedPath, key, minimatchOptions)) {
           return true;
         }
       }
@@ -53,13 +67,7 @@ async function run() {
   if (applicableChecklistPaths.length > 0) {
     const body = [
       `${header}\n\n`,
-      ...applicableChecklistPaths.map(([path, items]) => {
-        return [
-          `__Files matching \`${path}\`:__\n`,
-          ...items.map(item => `- [ ] ${item}\n`),
-          "\n"
-        ].join("");
-      }),
+      ...applicableChecklistPaths.map(formatItemsForPath),
       `\n${footer}`
     ].join("");
 
