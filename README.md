@@ -44,7 +44,34 @@ jobs:
         uses: wyozi/contextual-qa-checklist-action@master
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
+          # See options documentation below
 ```
+
+#### Options
+
+##### `comment-header`
+
+Overrides the default header text in the PR comment.
+
+##### `comment-footer`
+
+Overrides the default footer text in the PR comment.
+
+##### `include-hidden-files`
+
+Includes files and folders starting with `.` when matching. Defaults to `false`.
+
+##### `input-file`
+
+The path to the checklist definition file. Default to `CHECKLIST.yml` in the project root.
+
+##### `gh-token`
+
+The Github token for you project.
+
+##### `show-paths`
+
+Shows the matched file path in the PR comment. Defaults to `true`.
 
 #### Result
 
