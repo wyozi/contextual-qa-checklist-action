@@ -5,3 +5,4 @@ paths:
     - Did you update distributable with `yarn build-dist`?
   "CHECKLIST.yml":
     - Are items grammatically correct?
+
