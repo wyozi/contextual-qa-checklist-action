@@ -1,5 +1,5 @@
 const core = require("@actions/core");
-const github = require("@actions/github");
+import * as github from "@actions/github";
 const YAML = require("yaml");
 const minimatch = require("minimatch");
 const { readFileSync } = require("fs");
@@ -30,18 +30,19 @@ function formatItemsForPath([path, items]): string {
 }
 
 async function run() {
-  const issue: { owner: string; repo: string; number: number } =
-    github.context.issue;
+  const context = github.context;
+  const { owner, repo } = context.repo;
+  const number = (context.payload.issue ?? context.payload.pull_request ?? context.payload).number;
 
   const ghToken = core.getInput("gh-token");
-  const client = new github.GitHub(ghToken);
+  const client = github.getOctokit(ghToken);
 
   const checklistPaths = getChecklistPaths();
   const modifiedPaths: string[] = (
-    await client.pulls.listFiles({
-      owner: issue.owner,
-      repo: issue.repo,
-      pull_number: issue.number
+    await client.rest.pulls.listFiles({
+      owner: owner,
+      repo: repo,
+      pull_number: number
     })
   ).data.map(file => file.filename);
 
@@ -57,10 +58,10 @@ async function run() {
   );
 
   const existingComment = (
-    await client.issues.listComments({
-      owner: issue.owner,
-      repo: issue.repo,
-      issue_number: issue.number
+    await client.rest.issues.listComments({
+      owner: owner,
+      repo: repo,
+      issue_number: number
     })
   ).data.find(comment => comment.body.includes(footer));
 
@@ -72,25 +73,25 @@ async function run() {
     ].join("");
 
     if (existingComment) {
-      await client.issues.updateComment({
-        owner: issue.owner,
-        repo: issue.repo,
+      await client.rest.issues.updateComment({
+        owner: owner,
+        repo: repo,
         comment_id: existingComment.id,
         body
       });
     } else {
-      await client.issues.createComment({
-        owner: issue.owner,
-        repo: issue.repo,
-        issue_number: issue.number,
+      await client.rest.issues.createComment({
+        owner: owner,
+        repo: repo,
+        issue_number: number,
         body
       });
     }
   } else {
     if (existingComment) {
-      await client.issues.deleteComment({
-        owner: issue.owner,
-        repo: issue.repo,
+      await client.rest.issues.deleteComment({
+        owner: owner,
+        repo: repo,
         comment_id: existingComment.id
       });
     }

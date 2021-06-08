@@ -13,9 +13,12 @@
   },
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^2.0.0",
-    "@zeit/ncc": "^0.20.5",
+    "@actions/github": "^5.0.0",
+    "@vercel/ncc": "^0.28.6",
     "minimatch": "^3.0.4",
     "yaml": "^1.7.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.2"
   }
 }
