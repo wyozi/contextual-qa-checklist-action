@@ -1,5 +1,5 @@
 name: "Contextual QA Checklists"
-description: "Submit a comment to PRs with a QA checklist based on context"
+description: "Automated Pull Request checklist based on changed files"
 inputs:
   comment-header:
     description: "Header text for the Github comment"
