@@ -14,19 +14,48 @@ const minimatchOptions = {
 function getChecklistPaths(): Record<string, string[]> {
   const inputFile = core.getInput("input-file");
   const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
-  return parsedFile.paths;
+  return parsedFile;
 }
 
-function formatItemsForPath([path, items]): string {
+function formatItemsForPath(applicableChecklist): string {
   const showPaths = core.getInput("show-paths") === 'true';
 
-  return showPaths
-  ? [
-      `__Files matching \`${path}\`:__\n`,
-      ...items.map((item) => `- [ ] ${item}\n`),
-      "\n",
-    ].join("")
-  : [...items.map((item) => `- [ ] ${item}\n`)].join("");
+  let text = ""
+  for (const temp of applicableChecklist) {
+    if (showPaths){
+      text +=
+        `__Files were changed in the following path(s):__\n` +
+        `${temp.changedPath.map((path) => `- \`${path}\``).join("\n")}\n`+
+        `\n${temp.description}\n` +
+        `${temp.items.map((item) => `- [ ] ${item}`).join("\n")}\n\n`;
+    } else {
+      text +=
+        `${temp.description}\n` +
+        `${temp.items.map((item) => `- [ ] ${item}`).join("\n")}\n\n`;
+      }
+    }
+  return text;
+}
+
+function getMatchingPaths(checklistPaths, modifiedPaths) {
+  let applicableChecklistPaths = [];
+  for (const [key, value] of Object.entries(checklistPaths)){
+    let isApplicable = false
+    let changedPath = []
+    for (const path in (value as any).paths){
+      for (const modifiedPath of modifiedPaths) {
+        if (minimatch(modifiedPath, (value as any).paths[path], minimatchOptions)) {
+          changedPath.push((value as any).paths[path])
+          isApplicable = true
+        }
+      }
+    }
+    if (isApplicable) {
+      (value as any).changedPath = changedPath
+      applicableChecklistPaths.push(value)
+    }
+  }
+  return applicableChecklistPaths;
 }
 
 async function run() {
@@ -46,16 +75,7 @@ async function run() {
     })
   ).data.map(file => file.filename);
 
-  const applicableChecklistPaths = Object.entries(checklistPaths).filter(
-    ([key, _]) => {
-      for (const modifiedPath of modifiedPaths) {
-        if (minimatch(modifiedPath, key, minimatchOptions)) {
-          return true;
-        }
-      }
-      return false;
-    }
-  );
+  const applicableChecklistPaths = getMatchingPaths(checklistPaths, modifiedPaths);
 
   const existingComment = (
     await client.rest.issues.listComments({
@@ -68,8 +88,8 @@ async function run() {
   if (applicableChecklistPaths.length > 0) {
     const body = [
       `${header}\n\n`,
-      ...applicableChecklistPaths.map(formatItemsForPath),
-      `\n${footer}`
+      formatItemsForPath(applicableChecklistPaths),
+      `\n${footer}`,
     ].join("");
 
     if (existingComment) {

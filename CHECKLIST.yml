@@ -1,7 +1,20 @@
-paths:
-  "*.ts":
-    - Does code have tests?
-    - Are possibly unused imports removed?
-    - Did you update distributable with `yarn build-dist`?
-  "CHECKLIST.yml":
-    - Are items grammatically correct?
+store:
+  "paths":
+    - "Store/**.js"
+    - "Cart/**.html"
+  "description":
+    - Please check the following store pages (general)
+  "items":
+    - Store checklist 1
+    - Store checklist 2
+    - Store checklist 3
+blog:
+  "paths":
+    - "Blog/**.php"
+    - "Blogger/**.ts"
+  "description":
+    - Please check the following blog pages (general)
+  "items":
+    - Blog checklist 1
+    - Blog checklist 2
+    - Blog checklist 3
