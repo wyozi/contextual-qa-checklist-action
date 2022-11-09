@@ -12,7 +12,7 @@ inputs:
   include-hidden-files:
     description: "Includes files and folders starting with '.' in file pattern matching"
     required: true
-    default: false
+    default: "false"
   input-file:
     description: "Path to file containing checklist definitions"
     required: true
@@ -23,9 +23,9 @@ inputs:
   show-paths:
     description: "Shows the matched file paths in the Github comment"
     required: true
-    default: true
+    default: "true"
 runs:
-  using: "node12"
+  using: "node16"
   main: "dist/index.js"
 branding:
   icon: "check-square"
