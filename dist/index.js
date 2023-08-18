@@ -19207,11 +19207,11 @@ function getChecklistPaths() {
     return parsedFile.paths;
 }
 function formatItemsForPath(previousComment, mergeComment, [path, items]) {
-    const existingChecklistItems = previousComment.split("\n").filter(line => line !== "" && (line.startsWith('- [ ]') || line.startsWith('- [x]'))).map(line => line.substring(5).trim());
     
     let checklistItems = items;
     if (!!previousComment && mergeComment) {
         checklistItems = checklistItems.map(item => {
+            const existingChecklistItems = previousComment.split("\n").filter(line => line !== "" && (line.startsWith('- [ ]') || line.startsWith('- [x]'))).map(line => line.substring(5).trim());
             const existingItem = existingChecklistItems.find(existingItem => existingItem.includes(item));
             if (!existingItem){
                 return item;
