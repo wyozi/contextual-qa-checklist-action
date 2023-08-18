@@ -19219,27 +19219,32 @@ function formatItemsForPath(previousComment, mergeComment, [path, items]) {
                     existingItem.includes(item)
                 );
             });
+        const newItems = items.filter((item) => {
+            return !existingCheckedItems.find((existingItem) =>
+                    existingItem.includes(item)
+                );
+            });
         
         return showPaths
         ? [
             `__Files matching \`${path}\`:__\n`,
             ...preservedItems.map((item) => `- [x] ${item}\n`),
-            ...checklistItems.map((item) => `- [ ] ${item}\n`),
+            ...newItems.map((item) => `- [ ] ${item}\n`),
             "\n",
             ].join("")
         : [
             ...preservedItems.map((item) => `- [x] ${item}\n`),
-            ...checklistItems.map((item) => `- [ ] ${item}\n`),
+            ...newItems.map((item) => `- [ ] ${item}\n`),
             ].join("");
     }
 
     return showPaths
         ? [
             `__Files matching \`${path}\`:__\n`,
-            ...checklistItems.map((item) => `- [ ] ${item}\n`),
+            ...items.map((item) => `- [ ] ${item}\n`),
             "\n",
         ].join("")
-        : [...checklistItems.map((item) => `- [ ] ${item}\n`)].join("");
+        : [...items.map((item) => `- [ ] ${item}\n`)].join("");
 
 }
 function run() {
