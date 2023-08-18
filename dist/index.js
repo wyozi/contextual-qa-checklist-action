@@ -19207,20 +19207,32 @@ function getChecklistPaths() {
     return parsedFile.paths;
 }
 function formatItemsForPath(previousComment, mergeComment, [path, items]) {
+    const showPaths = core.getInput("show-paths") === "true";
     
-    let checklistItems = items;
     if (!!previousComment && mergeComment) {
-        checklistItems = checklistItems.map(item => {
-            const existingChecklistItems = previousComment.split("\n").filter(line => line !== "" && (line.startsWith('- [ ]') || line.startsWith('- [x]'))).map(line => line.substring(5).trim());
-            const existingItem = existingChecklistItems.find(existingItem => existingItem.includes(item));
-            if (!existingItem){
-                return item;
-            }
-            return existingItem;
-        })
+        const existingCheckedItems = previousComment
+            .split("\n")
+            .filter((line) => line !== "" && line.startsWith("- [x]"))
+            .map((line) => line.substring(5).trim());
+        const preservedItems = items.filter((item) => {
+            return !!existingCheckedItems.find((existingItem) =>
+                    existingItem.includes(item)
+                );
+            });
+        
+        return showPaths
+        ? [
+            `__Files matching \`${path}\`:__\n`,
+            ...preservedItems.map((item) => `- [x] ${item}\n`),
+            ...checklistItems.map((item) => `- [ ] ${item}\n`),
+            "\n",
+            ].join("")
+        : [
+            ...preservedItems.map((item) => `- [x] ${item}\n`),
+            ...checklistItems.map((item) => `- [ ] ${item}\n`),
+            ].join("");
     }
 
-    const showPaths = core.getInput("show-paths") === 'true';
     return showPaths
         ? [
             `__Files matching \`${path}\`:__\n`,
@@ -19228,6 +19240,7 @@ function formatItemsForPath(previousComment, mergeComment, [path, items]) {
             "\n",
         ].join("")
         : [...checklistItems.map((item) => `- [ ] ${item}\n`)].join("");
+
 }
 function run() {
     var _a, _b;
@@ -19259,7 +19272,7 @@ function run() {
         if (applicableChecklistPaths.length > 0) {
             const body = [
                 `${header}\n\n`,
-                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment, mergeComment, [path, items])),
+                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment.body, mergeComment, [path, items])),
                 `\n${footer}`
             ].join("");
             if (existingComment) {
