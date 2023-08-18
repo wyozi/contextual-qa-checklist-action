@@ -19197,6 +19197,7 @@ const minimatch = __nccwpck_require__(3973);
 const { readFileSync } = __nccwpck_require__(5747);
 const header = core.getInput("comment-header");
 const footer = core.getInput("comment-footer");
+const mergeComment = core.getInput("merge-comment") === 'true';
 const minimatchOptions = {
     dot: core.getInput('include-hidden-files') === 'true'
 };
@@ -19205,15 +19206,28 @@ function getChecklistPaths() {
     const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
     return parsedFile.paths;
 }
-function formatItemsForPath([path, items]) {
+function formatItemsForPath(previousComment, mergeComment, [path, items]) {
+    const existingChecklistItems = previousComment.split("\n").filter(line => line !== "" && (line.startsWith('- [ ]') || line.startsWith('- [x]'))).map(line => line.substring(5).trim());
+    
+    let checklistItems = items;
+    if (!!previousComment && mergeComment) {
+        checklistItems = checklistItems.map(item => {
+            const existingItem = existingChecklistItems.find(existingItem => existingItem.includes(item));
+            if (!existingItem){
+                return item;
+            }
+            return existingItem;
+        })
+    }
+
     const showPaths = core.getInput("show-paths") === 'true';
     return showPaths
         ? [
             `__Files matching \`${path}\`:__\n`,
-            ...items.map((item) => `- [ ] ${item}\n`),
+            ...checklistItems.map((item) => `- [ ] ${item}\n`),
             "\n",
         ].join("")
-        : [...items.map((item) => `- [ ] ${item}\n`)].join("");
+        : [...checklistItems.map((item) => `- [ ] ${item}\n`)].join("");
 }
 function run() {
     var _a, _b;
@@ -19245,7 +19259,7 @@ function run() {
         if (applicableChecklistPaths.length > 0) {
             const body = [
                 `${header}\n\n`,
-                ...applicableChecklistPaths.map(formatItemsForPath),
+                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment, mergeComment, [path, items])),
                 `\n${footer}`
             ].join("");
             if (existingComment) {

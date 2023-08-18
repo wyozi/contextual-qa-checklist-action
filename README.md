@@ -57,6 +57,10 @@ Overrides the default header text in the PR comment.
 
 Overrides the default footer text in the PR comment.
 
+##### `merge-comment`
+
+Merges any new checklist items with the existing checklist comment.
+
 ##### `include-hidden-files`
 
 Includes files and folders starting with `.` when matching. Defaults to `false`.
