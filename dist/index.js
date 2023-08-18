@@ -19259,7 +19259,7 @@ function run() {
         if (applicableChecklistPaths.length > 0) {
             const body = [
                 `${header}\n\n`,
-                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment, mergeComment, [path, items])),
+                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment.body, mergeComment, [path, items])),
                 `\n${footer}`
             ].join("");
             if (existingComment) {
