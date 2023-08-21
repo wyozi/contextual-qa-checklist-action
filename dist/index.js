@@ -19197,7 +19197,6 @@ const minimatch = __nccwpck_require__(3973);
 const { readFileSync } = __nccwpck_require__(5747);
 const header = core.getInput("comment-header");
 const footer = core.getInput("comment-footer");
-const mergeComment = core.getInput("merge-comment") === 'true';
 const minimatchOptions = {
     dot: core.getInput('include-hidden-files') === 'true'
 };
@@ -19206,38 +19205,8 @@ function getChecklistPaths() {
     const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
     return parsedFile.paths;
 }
-function formatItemsForPath(previousComment, mergeComment, [path, items]) {
-    const showPaths = core.getInput("show-paths") === "true";
-    
-    if (!!previousComment && mergeComment) {
-        const existingCheckedItems = previousComment
-            .split("\n")
-            .filter((line) => line !== "" && line.startsWith("- [x]"))
-            .map((line) => line.substring(5).trim());
-        const preservedItems = items.filter((item) => {
-            return !!existingCheckedItems.find((existingItem) =>
-                    existingItem.includes(item)
-                );
-            });
-        const newItems = items.filter((item) => {
-            return !existingCheckedItems.find((existingItem) =>
-                    existingItem.includes(item)
-                );
-            });
-        
-        return showPaths
-        ? [
-            `__Files matching \`${path}\`:__\n`,
-            ...preservedItems.map((item) => `- [x] ${item}\n`),
-            ...newItems.map((item) => `- [ ] ${item}\n`),
-            "\n",
-            ].join("")
-        : [
-            ...preservedItems.map((item) => `- [x] ${item}\n`),
-            ...newItems.map((item) => `- [ ] ${item}\n`),
-            ].join("");
-    }
-
+function formatItemsForPath([path, items]) {
+    const showPaths = core.getInput("show-paths") === 'true';
     return showPaths
         ? [
             `__Files matching \`${path}\`:__\n`,
@@ -19245,7 +19214,6 @@ function formatItemsForPath(previousComment, mergeComment, [path, items]) {
             "\n",
         ].join("")
         : [...items.map((item) => `- [ ] ${item}\n`)].join("");
-
 }
 function run() {
     var _a, _b;
@@ -19277,7 +19245,7 @@ function run() {
         if (applicableChecklistPaths.length > 0) {
             const body = [
                 `${header}\n\n`,
-                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment.body, mergeComment, [path, items])),
+                ...applicableChecklistPaths.map(formatItemsForPath),
                 `\n${footer}`
             ].join("");
             if (existingComment) {
