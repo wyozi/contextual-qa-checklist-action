@@ -9,6 +9,10 @@ inputs:
     description: "Footer text for the Github comment"
     required: true
     default: "This is an automatically generated QA checklist based on modified files."
+  merge-comment:
+    description: "Merges any new checklist items with the existing checklist comment"
+    required: true
+    default: "true"
   include-hidden-files:
     description: "Includes files and folders starting with '.' in file pattern matching"
     required: true
