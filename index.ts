@@ -103,7 +103,10 @@ async function run() {
     const body = [
       `${header}\n\n`,
       ...applicableChecklistPaths.map(([path, items]) =>
-        formatItemsForPath(existingComment.body, [path, items])
+        formatItemsForPath(
+          !!existingComment ? existingComment.body : undefined,
+          [path, items]
+        )
       ),
       `\n${footer}`,
     ].join("");
