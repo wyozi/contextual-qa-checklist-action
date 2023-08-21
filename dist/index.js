@@ -19198,15 +19198,39 @@ const { readFileSync } = __nccwpck_require__(5747);
 const header = core.getInput("comment-header");
 const footer = core.getInput("comment-footer");
 const minimatchOptions = {
-    dot: core.getInput('include-hidden-files') === 'true'
+    dot: core.getInput("include-hidden-files") === "true",
 };
 function getChecklistPaths() {
     const inputFile = core.getInput("input-file");
     const parsedFile = YAML.parse(readFileSync(inputFile, { encoding: "utf8" }));
     return parsedFile.paths;
 }
-function formatItemsForPath([path, items]) {
-    const showPaths = core.getInput("show-paths") === 'true';
+function formatItemsForPath(previousComment, [path, items]) {
+    const showPaths = core.getInput("show-paths") === "true";
+    const mergeComment = core.getInput("merge-comment") === "true";
+    if (!!previousComment && mergeComment) {
+        const existingCheckedItems = previousComment
+            .split("\n")
+            .filter((line) => line !== "" && line.startsWith("- [x]"))
+            .map((line) => line.substring(5).trim());
+        const preservedItems = items.filter((item) => {
+            return !!existingCheckedItems.find((existingItem) => existingItem.includes(item));
+        });
+        const newItems = items.filter((item) => {
+            return !existingCheckedItems.find((existingItem) => existingItem.includes(item));
+        });
+        return showPaths
+            ? [
+                `__Files matching \`${path}\`:__\n`,
+                ...preservedItems.map((item) => `- [x] ${item}\n`),
+                ...newItems.map((item) => `- [ ] ${item}\n`),
+                "\n",
+            ].join("")
+            : [
+                ...preservedItems.map((item) => `- [x] ${item}\n`),
+                ...newItems.map((item) => `- [ ] ${item}\n`),
+            ].join("");
+    }
     return showPaths
         ? [
             `__Files matching \`${path}\`:__\n`,
@@ -19227,8 +19251,8 @@ function run() {
         const modifiedPaths = (yield client.rest.pulls.listFiles({
             owner: owner,
             repo: repo,
-            pull_number: number
-        })).data.map(file => file.filename);
+            pull_number: number,
+        })).data.map((file) => file.filename);
         const applicableChecklistPaths = Object.entries(checklistPaths).filter(([key, _]) => {
             for (const modifiedPath of modifiedPaths) {
                 if (minimatch(modifiedPath, key, minimatchOptions)) {
@@ -19240,20 +19264,20 @@ function run() {
         const existingComment = (yield client.rest.issues.listComments({
             owner: owner,
             repo: repo,
-            issue_number: number
-        })).data.find(comment => comment.body.includes(footer));
+            issue_number: number,
+        })).data.find((comment) => comment.body.includes(footer));
         if (applicableChecklistPaths.length > 0) {
             const body = [
                 `${header}\n\n`,
-                ...applicableChecklistPaths.map(formatItemsForPath),
-                `\n${footer}`
+                ...applicableChecklistPaths.map(([path, items]) => formatItemsForPath(existingComment.body, [path, items])),
+                `\n${footer}`,
             ].join("");
             if (existingComment) {
                 yield client.rest.issues.updateComment({
                     owner: owner,
                     repo: repo,
                     comment_id: existingComment.id,
-                    body
+                    body,
                 });
             }
             else {
@@ -19261,7 +19285,7 @@ function run() {
                     owner: owner,
                     repo: repo,
                     issue_number: number,
-                    body
+                    body,
                 });
             }
         }
@@ -19270,14 +19294,14 @@ function run() {
                 yield client.rest.issues.deleteComment({
                     owner: owner,
                     repo: repo,
-                    comment_id: existingComment.id
+                    comment_id: existingComment.id,
                 });
             }
             console.log("No paths were modified that match checklist paths");
         }
     });
 }
-run().catch(err => core.setFailed(err.message));
+run().catch((err) => core.setFailed(err.message));
 
 })();
 
