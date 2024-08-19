@@ -12,7 +12,7 @@
     "build-dist": "ncc build index.ts"
   },
   "dependencies": {
-    "@actions/core": "^1.2.6",
+    "@actions/core": "^1.9.1",
     "@actions/github": "^5.0.0",
     "@vercel/ncc": "^0.28.6",
     "minimatch": "^3.0.4",
