@@ -15,7 +15,7 @@
     "@actions/core": "^1.2.6",
     "@actions/github": "^5.0.0",
     "@vercel/ncc": "^0.28.6",
-    "minimatch": "^3.0.4",
+    "minimatch": "^10.2.1",
     "yaml": "^1.7.2"
   },
   "devDependencies": {
